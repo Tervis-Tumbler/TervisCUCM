@@ -18,6 +18,7 @@ function Find-CUCMUserWithoutMatchingTelephoneNumberInAD {
     }
 }
 
+
 Function Invoke-TervisCUCMTerminateUserWithoutUserInCUCM {
     param(
         [Parameter(Mandatory)]$PhoneName
@@ -69,3 +70,15 @@ enduser.pkid=enduserdevicemap.fkenduser and enduser.userid = '$UserIDAssociatedW
 
     Invoke-CUCMSQLQuery -SQL $QueryForDevicesByUserID
 }
+
+function Add-CallcenterAgent {
+
+    param(
+         [Parameter(Mandatory)][String]$UserName
+    )
+
+    Add-CUCMPhone -UserID $UserName
+    Set-CUCMUser -UserID $UserName
+    Set-CUCMIPCCExtension -UserID $UserName
+
+    }
