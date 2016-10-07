@@ -82,3 +82,157 @@ function Add-CallcenterAgent {
     Set-CUCMIPCCExtension -UserID $UserName
 
     }
+
+function Set-CUCMAgentLine  {
+
+     param  (
+        [Parameter(Mandatory)][String]$Pattern,
+        #[Parameter(Mandatory)][String]$UserID,
+        [Parameter(Mandatory)][String]$routePartition,
+        [Parameter(Mandatory)][String]$CSS,
+        [String]$Description,
+        [String]$AlertingName,
+        [String]$AsciiAlertingName,
+        [String]$voiceMailProfileName,
+        $userHoldMohAudioSourceId,
+        $networkHoldMohAudioSourceId,
+        $CallForwardAllForwardToVoiceMail,
+        $CallForwardAllcallingSearchSpaceName,
+        $CallForwardAllsecondarycallingSearchSpaceName,
+        $CallForwardBusyForwardToVoiceMail,
+        $CallForwardBusycallingSearchSpaceName,
+        $CallForwardBusyIntForwardToVoiceMail,
+        $CallForwardBusyIntcallingSearchSpaceName,
+        $callForwardNoAnswerForwardToVoiceMail,
+        $callForwardNoAnswercallingSearchSpaceName,
+        $CallForwardNoAnswerIntForwardToVoiceMail,
+        $CallForwardNoAnswerIntcallingSearchSpaceName,
+        $callForwardNoCoverageForwardToVoiceMail,
+        $callForwardNoCoveragecallingSearchSpaceName,
+        $callForwardNoCoverageIntForwardToVoiceMail,
+        $callForwardNoCoverageIntcallingSearchSpaceName,
+        $callForwardOnFailureForwardToVoiceMail,
+        $callForwardOnFailurecallingSearchSpaceName,
+        $callForwardNotRegisteredForwardToVoiceMail,
+        $callForwardNotRegisteredcallingSearchSpaceName,
+        $callForwardNotRegisteredIntForwardToVoiceMail,
+        $callForwardNotRegisteredIntcallingSearchSpaceName,
+        $index,
+        [String]$display
+    
+      )
+
+
+$AXL = @"
+
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.cisco.com/AXL/API/9.1">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <ns:updateLine sequence="?">
+         <pattern>$Pattern</pattern>
+         <routePartitionName>$routePartition</routePartitionName>
+         <description>$Description</description>
+         <alertingName>$alertingName</alertingName>
+         <asciiAlertingName>$asciiAlertingName</asciiAlertingName>
+         <voiceMailProfileName>$voiceMailProfileName</voiceMailProfileName>
+         <shareLineAppearanceCssName>$CSS</shareLineAppearanceCssName>
+         <userHoldMohAudioSourceId>$userHoldMohAudioSourceId</userHoldMohAudioSourceId>
+         <networkHoldMohAudioSourceId>$networkHoldMohAudioSourceId</networkHoldMohAudioSourceId>
+         $(
+         if ($CallForwardAllForwardToVoiceMail) {
+         "<callForwardAll>"
+                   $(New-XMLElement -Name forwardToVoiceMail -InnerText $CallForwardAllForwardToVoiceMail -AsString)
+                   $(New-XMLElement -Name callingSearchSpaceName  -InnerText $CallForwardAllcallingSearchSpaceName -AsString)
+                   $(New-XMLElement -Name secondaryCallingSearchSpaceName  -InnerText $CallForwardAllsecondarycallingSearchSpaceName -AsString)
+         "</callForwardAll>" 
+         }
+         )
+         $(
+         if ($CallForwardBusyForwardToVoiceMail) {
+         "<callForwardBusy>"
+                   $(New-XMLElement -Name forwardToVoiceMail -InnerText $CallForwardBusyForwardToVoiceMail -AsString)
+                   $(New-XMLElement -Name callingSearchSpaceName  -InnerText $CallForwardBusycallingSearchSpaceName -AsString)
+         "</callForwardBusy>"
+         }
+         )
+         $(
+         if ($CallForwardBusyIntForwardToVoiceMail) {
+         "<callForwardBusyInt>"
+                   $(New-XMLElement -Name forwardToVoiceMail -InnerText $CallForwardBusyIntForwardToVoiceMail -AsString)
+                   $(New-XMLElement -Name callingSearchSpaceName  -InnerText $CallForwardBusyIntcallingSearchSpaceName -AsString)
+         "</callForwardBusyInt>"
+         }
+         )
+         $(
+         if ($CallForwardNoAnswerForwardToVoiceMail) {
+         "<callForwardNoAnswer>"
+                   $(New-XMLElement -Name forwardToVoiceMail -InnerText $CallForwardNoAnswerForwardToVoiceMail -AsString)
+                   $(New-XMLElement -Name callingSearchSpaceName  -InnerText $CallForwardNoAnswercallingSearchSpaceName -AsString)
+         "</callForwardNoAnswer>"
+         }
+         )
+         $(
+         if ($CallForwardNoAnswerIntForwardToVoiceMail) {
+         "<callForwardNoAnswerInt>"
+                    $(New-XMLElement -Name forwardToVoiceMail -InnerText $CallForwardNoAnswerIntForwardToVoiceMail -AsString)                   
+                    $(New-XMLElement -Name callingSearchSpaceName -InnerText $CallForwardNoAnswerIntcallingSearchSpaceName -AsString)
+         "</callForwardNoAnswerInt>"
+         }
+         )
+         $(
+         if ($CallForwardNoCoverageForwardToVoiceMail) {
+         "<callForwardNoCoverage>"
+                   $(New-XMLElement -Name forwardToVoiceMail -InnerText $CallForwardNoCoverageForwardToVoiceMail -AsString)
+                   $(New-XMLElement -Name callingSearchSpaceName  -InnerText $CallForwardNoCoveragecallingSearchSpaceName -AsString)
+         "</callForwardNoCoverage>"
+         }
+         )
+         $(
+         if ($CallForwardNoCoverageIntForwardToVoiceMail) {
+         "<callForwardNoCoverageInt>"
+                   $(New-XMLElement -Name forwardToVoiceMail -InnerText $CallForwardNoCoverageIntForwardToVoiceMail -AsString)
+                   $(New-XMLElement -Name callingSearchSpaceName  -InnerText $CallForwardNoCoverageIntcallingSearchSpaceName -AsString)
+         "</callForwardNoCoverageInt>"
+         }
+         )
+         $(
+         if ($CallForwardOnFailureForwardToVoiceMail) {
+         "<callForwardOnFailure>"
+                   $(New-XMLElement -Name forwardToVoiceMail -InnerText $CallForwardOnFailureForwardToVoiceMail -AsString)
+                   $(New-XMLElement -Name callingSearchSpaceName  -InnerText $CallForwardOnFailurecallingSearchSpaceName -AsString)
+         "</callForwardOnFailure>"
+         }
+         )
+         $(
+         if ($CallForwardNotRegisteredForwardToVoiceMail) {
+         "<callForwardNotRegistered>"
+                   $(New-XMLElement -Name forwardToVoiceMail -InnerText $CallForwardNotRegisteredForwardToVoiceMail -AsString)
+                   $(New-XMLElement -Name callingSearchSpaceName  -InnerText $CallForwardNotRegisteredcallingSearchSpaceName -AsString)
+         "</callForwardNotRegistered>"
+         }
+         )
+         $(
+         if ($CallForwardNotRegisteredIntForwardToVoiceMail) {
+         "<callForwardNotRegisteredInt>"
+                   $(New-XMLElement -Name forwardToVoiceMail -InnerText $CallForwardNotRegisteredIntForwardToVoiceMail -AsString)
+                   $(New-XMLElement -Name callingSearchSpaceName -InnerText $CallForwardNotRegisteredIntcallingSearchSpaceName -AsString)
+         "</callForwardNotRegisteredInt>"
+         }
+         )
+         <Lines>
+         <lineIdentifier>
+         <index>$index</index>
+         <display>$display</display>
+         </lineIdentifier>
+         </Lines>
+    </ns:updateLine>
+    </soapenv:Body>
+</soapenv:Envelope>
+
+"@
+   
+     $XmlContent = Invoke-CUCMSOAPAPIFunction -AXL $AXL -MethodName updateLine
+     $XmlContent.Envelope.Body.updateLineResponse.return
+    
+    
+}
