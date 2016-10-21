@@ -236,3 +236,13 @@ $AXL = @"
     
     
 }
+
+function New-TervisCUCMCredential {
+    $CUCMCredentialFromPasswordState = Get-PasswordstateCredential -PasswordstateListAPIKey (Get-PasswordStateAPIKey) -PasswordID 15
+    $CUCMUsername = $CUCMCredentialFromPasswordState.UserName
+    $CUCMPassword = $CUCMCredentialFromPasswordState.Password
+    $CUCMCredentialObject = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $CUCMUsername, $CUCMPassword
+    
+    New-CUCMCredential -CUCMCredential $CUCMCredentialObject 
+
+}
