@@ -1,5 +1,9 @@
 ﻿#Requires -Modules CUCMPowerShell
 
+function Install-TervisCUCM {
+    New-TervisCUCMCredential    
+}
+
 function Find-CUCMUserWithoutMatchingTelephoneNumberInAD {
     $CUCMUsers = Find-CUCMUser -firstName "%"
     foreach ($CUCMUserID in $CUCMUsers.userID) {
@@ -238,11 +242,5 @@ $AXL = @"
 }
 
 function New-TervisCUCMCredential {
-    $CUCMCredentialFromPasswordState = Get-PasswordstateCredential -PasswordstateListAPIKey (Get-PasswordStateAPIKey) -PasswordID 15
-    $CUCMUsername = $CUCMCredentialFromPasswordState.UserName
-    $CUCMPassword = $CUCMCredentialFromPasswordState.Password
-    $CUCMCredentialObject = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $CUCMUsername, $CUCMPassword
-    
-    New-CUCMCredential -CUCMCredential $CUCMCredentialObject 
-
+    New-CUCMCredential -CUCMCredential $(Get-PasswordstateCredential -PasswordID 15)
 }
