@@ -48,17 +48,19 @@ Function Invoke-TervisCUCMTerminateUser {
         [Parameter(Mandatory)]$UserName
     )
 
-    $CUCMUser = Get-CUCMUser -UserID $UserName
-    $DeviceNames = $CUCMUser.associatedDevices.device
-    $Phones = foreach ($DeviceName in $DeviceNames) { Get-CUCMPhone -Name $DeviceName }
-    $Lines = $Phones.lines.line
+    $CUCMUser = Get-CUCMUser -UserID $UserName -ErrorAction SilentlyContinue
+    if ($CUCMUser) {
+        $DeviceNames = $CUCMUser.associatedDevices.device
+        $Phones = foreach ($DeviceName in $DeviceNames) { Get-CUCMPhone -Name $DeviceName }
+        $Lines = $Phones.lines.line
 
-    ForEach ($DirectoryNumber in $Lines.dirn ) { 
-        $SetCUCMLineResponse = Set-CUCMLine -Pattern $DirectoryNumber.Pattern -RoutePartitionName $DirectoryNumber.routePartitionName."#text" -Description "" -AlertingName "" -AsciiAlertingName "" 
+        ForEach ($DirectoryNumber in $Lines.dirn ) { 
+            $SetCUCMLineResponse = Set-CUCMLine -Pattern $DirectoryNumber.Pattern -RoutePartitionName $DirectoryNumber.routePartitionName."#text" -Description "" -AlertingName "" -AsciiAlertingName "" 
+        }
+
+        $RemoveCUCMPhoneResponse = $Phones | Remove-CUCMPhone
+        $RemoveCUCMPhoneResponse
     }
-
-    $RemoveCUCMPhoneResponse = $Phones | Remove-CUCMPhone
-    $RemoveCUCMPhoneResponse
 }
 
 function Get-CUCMDeviceName {
