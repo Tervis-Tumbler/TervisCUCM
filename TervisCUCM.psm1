@@ -53,8 +53,9 @@ Function Invoke-TervisCUCMTerminateUser {
         $DeviceNames = @()
         $DeviceNames += $CUCMUser.associatedDevices.device
         $DeviceNames += Get-CUCMDeviceNameByOwnerID -OwnerID $UserName
+        $UniqueDeviceNames = $DeviceNames | group -AsHashTable -AsString -NoElement | select -ExpandProperty name
 
-        $Phones = foreach ($DeviceName in $DeviceNames) { Get-CUCMPhone -Name $DeviceName }
+        $Phones = foreach ($DeviceName in $UniqueDeviceNames) { Get-CUCMPhone -Name $DeviceName }
         $Lines = $Phones.lines.line
 
         ForEach ($DirectoryNumber in $Lines.dirn ) { 
@@ -95,7 +96,7 @@ where fkenduser = (
 )
 "@
 
-    Invoke-CUCMSQLQuery -SQL $QueryCUCMDeviceByOwnerID
+    Invoke-CUCMSQLQuery -SQL $QueryCUCMDeviceByOwnerID | Select -ExpandProperty Name
 }
 
 function Add-CallcenterAgent {
