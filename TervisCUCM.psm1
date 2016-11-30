@@ -53,7 +53,7 @@ Function Invoke-TervisCUCMTerminateUser {
         $DeviceNames = @()
         $DeviceNames += $CUCMUser.associatedDevices.device
         $DeviceNames += Get-CUCMDeviceNameByOwnerID -OwnerID $UserName
-        $UniqueDeviceNames = $DeviceNames | group -AsHashTable -AsString -NoElement | select -ExpandProperty name
+        $UniqueDeviceNames = $DeviceNames | group -NoElement | select -ExpandProperty name
 
         $Phones = foreach ($DeviceName in $UniqueDeviceNames) { Get-CUCMPhone -Name $DeviceName }
         $Lines = $Phones.lines.line
