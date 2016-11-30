@@ -50,7 +50,10 @@ Function Invoke-TervisCUCMTerminateUser {
 
     $CUCMUser = Get-CUCMUser -UserID $UserName -ErrorAction SilentlyContinue
     if ($CUCMUser) {
-        $DeviceNames = $CUCMUser.associatedDevices.device
+        $DeviceNames = @()
+        $DeviceNames += $CUCMUser.associatedDevices.device
+        $DeviceNames += Get-CUCMDeviceNameByOwnerID -OwnerID $UserName
+
         $Phones = foreach ($DeviceName in $DeviceNames) { Get-CUCMPhone -Name $DeviceName }
         $Lines = $Phones.lines.line
 
@@ -63,7 +66,7 @@ Function Invoke-TervisCUCMTerminateUser {
     }
 }
 
-function Get-CUCMDeviceName {
+function Get-CUCMDeviceNameByAssociatedUserID {
     param(
         [Parameter(Mandatory)][String]$UserIDAssociatedWithDevice
     )
@@ -75,6 +78,24 @@ enduser.pkid=enduserdevicemap.fkenduser and enduser.userid = '$UserIDAssociatedW
 "@
 
     Invoke-CUCMSQLQuery -SQL $QueryForDevicesByUserID
+}
+
+function Get-CUCMDeviceNameByOwnerID {
+    param(
+        [Parameter(Mandatory)][String]$OwnerID
+    )
+
+    $QueryCUCMDeviceByOwnerID = @"
+select name
+from device
+where fkenduser = (
+    select pkid 
+    from enduser
+    where enduser.userid = '$OwnerID'
+)
+"@
+
+    Invoke-CUCMSQLQuery -SQL $QueryCUCMDeviceByOwnerID
 }
 
 function Add-CallcenterAgent {
