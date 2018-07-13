@@ -266,5 +266,5 @@ $AXL = @"
 }
 
 function New-TervisCUCMCredential {
-    New-CUCMCredential -CUCMCredential $(Get-PasswordstateCredential -PasswordID 15)
+    New-CUCMCredential -CUCMCredential $(Get-PasswordstatePassword -AsCredential -ID 15)
 }
